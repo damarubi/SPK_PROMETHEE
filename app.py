@@ -84,7 +84,7 @@ KRITERIA_INFO = {
            'opsi': {'≥ 10 Tahun': 3, '6-9 Tahun': 2, '2-5 Tahun': 1},
            'help': 'Lamanya calon bekerja di instansi'},
     'K2': {'nama': 'Penghasilan',
-           'opsi': {'2 - 2,5 juta/bln': 3, '2,5 - 3,5 juta/bln': 2, 'Passive': 1},
+           'opsi': {'2 - 2,5 juta/bln': 3, '2,5 - 3,5 juta/bln': 2, '≥ 3,5 juta/bln': 1},
            'help': 'Pendapatan per bulan'},
     'K3': {'nama': 'Pengeluaran / bulan',
            'opsi': {'> 3 juta/bln': 3, '2 - 3 juta/bln': 2, '< 2 juta/bln': 1},
@@ -100,7 +100,7 @@ KRITERIA_INFO = {
 DEFAULT_ALT = {
     'A1': {'K1': '≥ 10 Tahun',  'K2': '2,5 - 3,5 juta/bln', 'K3': '2 - 3 juta/bln', 'K4': 'PNS',  'K5': 'Sesuai'},
     'A2': {'K1': '6-9 Tahun',    'K2': '2,5 - 3,5 juta/bln', 'K3': '2 - 3 juta/bln', 'K4': 'PNS',  'K5': 'Sesuai'},
-    'A3': {'K1': '≥ 10 Tahun',  'K2': 'Passive',             'K3': '< 2 juta/bln',   'K4': 'PNS',  'K5': 'Sesuai'},
+    'A3': {'K1': '≥ 10 Tahun',  'K2': '≥ 3,5 juta/bln',       'K3': '< 2 juta/bln',   'K4': 'PNS',  'K5': 'Sesuai'},
     'A4': {'K1': '2-5 Tahun',    'K2': '2 - 2,5 juta/bln',   'K3': '2 - 3 juta/bln', 'K4': 'PPPK', 'K5': 'Sesuai'},
     'A5': {'K1': '6-9 Tahun',    'K2': '2 - 2,5 juta/bln',   'K3': '> 3 juta/bln',   'K4': 'PPPK', 'K5': 'Sesuai'},
 }
@@ -281,6 +281,23 @@ elif halaman == "Proses Perhitungan":
                 st.caption("Preferensi h(d)")
                 st.dataframe(pd.DataFrame([dict(zip(krit_list, h_vals))]), use_container_width=True, hide_index=True)
             st.divider()
+
+        # Tabel ringkasan semua nilai preferensi
+        st.markdown("### Tabel Nilai Preferensi")
+        st.markdown("Rangkuman seluruh hasil **d** dan **h(d)** untuk semua pasangan:")
+        summary_rows = []
+        for (a, b) in hp['pasangan']:
+            d_vals = hp['d'][(a, b)]
+            h_vals = hp['h'][(a, b)]
+            row_d = {'Pasangan': f"({a},{b})", ' ': 'd'}
+            row_h = {'Pasangan': f"({a},{b})", ' ': 'h(d)'}
+            for k, dv, hv in zip(krit_list, d_vals, h_vals):
+                row_d[k] = dv
+                row_h[k] = hv
+            summary_rows.append(row_d)
+            summary_rows.append(row_h)
+        df_summary = pd.DataFrame(summary_rows)
+        st.dataframe(df_summary, use_container_width=True, hide_index=True)
 
     # ── Langkah 3 — Cari Index Preferensi ──
     with st.expander("Langkah 3 — Cari Index Preferensi P(a, b)"):
